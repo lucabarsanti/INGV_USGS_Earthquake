@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.2.3 (2026-08-17)
+
+- Card: **interactive filters** — minimum magnitude chips (All/M2+..M5+),
+  period chips (1h/6h/24h/All) and a **🌍 World mode** that overlays the
+  global USGS M2.5+ feed (last 24 h) to explore quakes beyond your radius
+- Card: default zoom raised to 7; home marker smaller and rendered below
+  quake markers (discreet but visible)
+- New `show_filters` card option (default on), also in the visual editor
+
 ## 0.2.2 (2026-08-17)
 
 - Fix intermittent "Custom element doesn't exist: earthquake-map-card":
