@@ -1,10 +1,26 @@
 # 🌍 Earthquake Monitor (INGV + USGS + EMSC) for Home Assistant
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://github.com/hacs/integration)
+[![Status: Beta](https://img.shields.io/badge/status-beta%20%2F%20in%20testing-orange.svg)](#-beta-notice--avviso-beta)
 [![Validate](https://github.com/lucabarsanti/INGV_USGS_Earthquake/actions/workflows/validate.yml/badge.svg)](https://github.com/lucabarsanti/INGV_USGS_Earthquake/actions/workflows/validate.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 **English** | [Italiano](#-italiano)
+
+> ## 🧪 Beta notice / Avviso beta
+>
+> **EN** — This project is currently **in testing (beta)**. It works and is
+> covered by an automated test suite, but it has not yet been broadly tested
+> on real installations: expect rough edges, and please report anything odd
+> in the [issues](https://github.com/lucabarsanti/INGV_USGS_Earthquake/issues).
+>
+> **IT** — Questo progetto è attualmente **in fase di test (beta)**. Funziona
+> ed è coperto da una suite di test automatici, ma non è ancora stato provato
+> a fondo su installazioni reali: possibili spigoli, segnala qualsiasi
+> anomalia nelle [issues](https://github.com/lucabarsanti/INGV_USGS_Earthquake/issues).
+
+[![Open your Home Assistant instance and open this repository inside HACS.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=lucabarsanti&repository=INGV_USGS_Earthquake&category=integration)
+[![Open your Home Assistant instance and start setting up the integration.](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=earthquake_monitor)
 
 Real-time earthquake monitoring for Home Assistant, combining **INGV**
 (Istituto Nazionale di Geofisica e Vulcanologia), **USGS** (United States
@@ -52,9 +68,19 @@ MQTT, …).
 
 ### HACS (recommended)
 
+One click:
+
+[![Open your Home Assistant instance and open this repository inside HACS.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=lucabarsanti&repository=INGV_USGS_Earthquake&category=integration)
+
+then restart Home Assistant and add the integration:
+
+[![Open your Home Assistant instance and start setting up the integration.](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=earthquake_monitor)
+
+Or manually:
+
 1. HACS → ⋮ → **Custom repositories**
 2. Repository: `https://github.com/lucabarsanti/INGV_USGS_Earthquake` — Category: **Integration**
-3. Install **Earthquake Monitor (INGV + USGS)** and restart Home Assistant
+3. Install **Earthquake Monitor (INGV + USGS + EMSC)** and restart Home Assistant
 4. **Settings → Devices & Services → Add Integration → Earthquake Monitor**
 
 ### Manual
@@ -228,9 +254,19 @@ per un futuro **sismografo locale** (Raspberry Shake, MQTT, …).
 
 ### HACS (consigliato)
 
+Con un click:
+
+[![Apri la tua istanza Home Assistant e apri questo repository dentro HACS.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=lucabarsanti&repository=INGV_USGS_Earthquake&category=integration)
+
+poi riavvia Home Assistant e aggiungi l'integrazione:
+
+[![Apri la tua istanza Home Assistant e avvia la configurazione dell'integrazione.](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=earthquake_monitor)
+
+Oppure manualmente:
+
 1. HACS → ⋮ → **Repository personalizzati**
 2. Repository: `https://github.com/lucabarsanti/INGV_USGS_Earthquake` — Categoria: **Integrazione**
-3. Installa **Earthquake Monitor (INGV + USGS)** e riavvia Home Assistant
+3. Installa **Earthquake Monitor (INGV + USGS + EMSC)** e riavvia Home Assistant
 4. **Impostazioni → Dispositivi e servizi → Aggiungi integrazione → Earthquake Monitor**
 
 ### Manuale
