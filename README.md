@@ -1,4 +1,4 @@
-<p align="center"><img src="docs/icon.png" width="110" alt="Earthquake Monitor icon" /></p>
+<p align="center"><img src="https://raw.githubusercontent.com/lucabarsanti/INGV_USGS_Earthquake/main/docs/icon.png" width="110" alt="Earthquake Monitor icon" /></p>
 
 # 🌍 Earthquake Monitor (INGV + USGS + EMSC) for Home Assistant
 
@@ -32,7 +32,7 @@ distance/magnitude **alerts**, events for **notifications**, and a plugin
 architecture ready for a future **local seismograph** (Raspberry Shake,
 MQTT, …).
 
-<p align="center"><img src="docs/screenshot-card.png" width="420" alt="earthquake-map-card screenshot" /></p>
+<p align="center"><img src="https://raw.githubusercontent.com/lucabarsanti/INGV_USGS_Earthquake/main/docs/screenshot-card.png" width="420" alt="earthquake-map-card screenshot" /></p>
 
 > ⚠️ **This is NOT an earthquake early-warning system.** Data arrives from
 > public catalogs minutes after an event and must never be relied upon for
@@ -217,7 +217,7 @@ in un'unica integrazione — con una bella **scheda mappa Leaflet**, **allerte**
 per distanza/magnitudo, eventi per le **notifiche** e un'architettura pronta
 per un futuro **sismografo locale** (Raspberry Shake, MQTT, …).
 
-<p align="center"><img src="docs/screenshot-card.png" width="420" alt="screenshot della scheda earthquake-map-card" /></p>
+<p align="center"><img src="https://raw.githubusercontent.com/lucabarsanti/INGV_USGS_Earthquake/main/docs/screenshot-card.png" width="420" alt="screenshot della scheda earthquake-map-card" /></p>
 
 > ⚠️ **NON è un sistema di allarme sismico (early warning).** I dati arrivano
 > dai cataloghi pubblici minuti dopo l'evento e non devono mai essere usati
