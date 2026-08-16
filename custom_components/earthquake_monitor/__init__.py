@@ -7,7 +7,8 @@ from pathlib import Path
 from homeassistant.components.frontend import add_extra_js_url
 from homeassistant.components.http import StaticPathConfig
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant, ServiceCall
+from homeassistant.const import EVENT_HOMEASSISTANT_STARTED
+from homeassistant.core import CoreState, Event, HomeAssistant, ServiceCall
 import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.typing import ConfigType
 from homeassistant.loader import async_get_integration
@@ -37,6 +38,38 @@ SIMULATE_SCHEMA = vol.Schema(
 KM_PER_DEGREE = 111.19
 
 
+async def _async_register_lovelace_resource(hass: HomeAssistant, url: str) -> None:
+    """Register the card as a Lovelace resource (storage mode).
+
+    ``add_extra_js_url`` scripts are loaded in parallel with the first
+    dashboard render, so on slow connections the card can be briefly
+    undefined ("Custom element doesn't exist"). Lovelace *resources* are
+    awaited before rendering, which makes the card load deterministic.
+    """
+    lovelace = hass.data.get("lovelace")
+    resources = getattr(lovelace, "resources", None)
+    if resources is None or not hasattr(resources, "async_create_item"):
+        # Lovelace not loaded, or dashboards in YAML mode (the user manages
+        # resources manually in that case).
+        return
+    try:
+        if not resources.loaded:
+            await resources.async_load()
+            resources.loaded = True
+        base_url = url.split("?")[0]
+        for item in resources.async_items():
+            if item.get("url", "").split("?")[0] == base_url:
+                if item["url"] != url:  # version changed -> cache bust
+                    await resources.async_update_item(
+                        item["id"], {"res_type": "module", "url": url}
+                    )
+                return
+        await resources.async_create_item({"res_type": "module", "url": url})
+        _LOGGER.debug("Registered Lovelace resource %s", url)
+    except Exception as err:  # noqa: BLE001 - never break setup over this
+        _LOGGER.warning("Could not register the Lovelace resource: %s", err)
+
+
 async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     """Set up shared resources: the Lovelace map card and services."""
     hass.data.setdefault(DOMAIN, {})
@@ -53,7 +86,22 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
             ]
         )
         integration = await async_get_integration(hass, DOMAIN)
-        add_extra_js_url(hass, f"{card_url}?v={integration.version}")
+        versioned_url = f"{card_url}?v={integration.version}"
+        # Belt and braces: extra JS for YAML-mode dashboards, plus a proper
+        # Lovelace resource (awaited before render) for storage mode.
+        add_extra_js_url(hass, versioned_url)
+
+        async def _register_resource(_event: Event | None = None) -> None:
+            await _async_register_lovelace_resource(hass, versioned_url)
+
+        if hass.state is CoreState.running:
+            await _register_resource()
+        else:
+            # Lovelace is not loaded yet during startup — register once
+            # Home Assistant is fully started.
+            hass.bus.async_listen_once(
+                EVENT_HOMEASSISTANT_STARTED, _register_resource
+            )
 
     async def _coordinators() -> list[EarthquakeCoordinator]:
         return [

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.2 (2026-08-17)
+
+- Fix intermittent "Custom element doesn't exist: earthquake-map-card":
+  the card is now registered as a proper **Lovelace resource** (awaited
+  before dashboards render) in addition to the extra-JS injection.
+
 ## 0.2.1 (2026-08-17)
 
 - Card: the home position is now a **house marker** instead of a blue dot
