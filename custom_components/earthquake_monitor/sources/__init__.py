@@ -7,12 +7,14 @@ implementation. Add new sources here — e.g. a local seismograph
 from __future__ import annotations
 
 from .base import EarthquakeSource
+from .emsc import EmscSource
 from .ingv import IngvSource
 from .usgs import UsgsSource
 
 SOURCE_REGISTRY: dict[str, type[EarthquakeSource]] = {
     IngvSource.key: IngvSource,
     UsgsSource.key: UsgsSource,
+    EmscSource.key: EmscSource,
     # "local": LocalSeismographSource,  # planned — see local.py
 }
 

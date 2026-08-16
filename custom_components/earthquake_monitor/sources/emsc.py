@@ -1,7 +1,7 @@
-"""INGV (Istituto Nazionale di Geofisica e Vulcanologia) FDSN event source.
+"""EMSC (European-Mediterranean Seismological Centre) event source.
 
-API: https://webservices.ingv.it/ (FDSN event web service, GeoJSON output).
-Data license: CC BY 4.0 — https://terremoti.ingv.it/
+API: https://www.seismicportal.eu/fdsnws/event/1/ (JSON output).
+EMSC is often the fastest catalog for the Euro-Mediterranean region.
 """
 from __future__ import annotations
 
@@ -16,16 +16,12 @@ from .base import EarthquakeSource
 
 _LOGGER = logging.getLogger(__name__)
 
-BASE_URL = "https://webservices.ingv.it/fdsnws/event/1/query"
-# FDSN uses degrees for maxradius; ~111.19 km per degree.
+BASE_URL = "https://www.seismicportal.eu/fdsnws/event/1/query"
 KM_PER_DEGREE = 111.19
 REQUEST_TIMEOUT = 30
 
 
 def _parse_time(value: object) -> datetime | None:
-    """INGV returns ISO strings; be tolerant of epoch milliseconds too."""
-    if isinstance(value, (int, float)):
-        return datetime.fromtimestamp(value / 1000, tz=UTC)
     if isinstance(value, str):
         parsed = dt_util.parse_datetime(value)
         if parsed is not None:
@@ -35,11 +31,11 @@ def _parse_time(value: object) -> datetime | None:
     return None
 
 
-class IngvSource(EarthquakeSource):
-    """Earthquakes from the INGV FDSN event web service."""
+class EmscSource(EarthquakeSource):
+    """Earthquakes from the EMSC seismicportal FDSN web service."""
 
-    key = "ingv"
-    name = "INGV"
+    key = "emsc"
+    name = "EMSC"
 
     async def async_fetch(
         self,
@@ -52,7 +48,7 @@ class IngvSource(EarthquakeSource):
         min_magnitude: float,
     ) -> list[Quake]:
         params = {
-            "format": "geojson",
+            "format": "json",
             "starttime": start.strftime("%Y-%m-%dT%H:%M:%S"),
             "minmagnitude": str(min_magnitude),
             "latitude": str(latitude),
@@ -63,7 +59,7 @@ class IngvSource(EarthquakeSource):
         async with session.get(
             BASE_URL, params=params, timeout=REQUEST_TIMEOUT
         ) as resp:
-            # INGV replies 204 when there are no matching events.
+            # seismicportal replies 204 when there are no matching events.
             if resp.status == 204:
                 return []
             resp.raise_for_status()
@@ -73,30 +69,29 @@ class IngvSource(EarthquakeSource):
         for feature in data.get("features", []):
             try:
                 props = feature.get("properties", {})
-                geometry = feature.get("geometry", {})
-                coords = geometry.get("coordinates", [])
                 event_time = _parse_time(props.get("time"))
                 magnitude = props.get("mag")
-                if event_time is None or magnitude is None or len(coords) < 2:
+                lat = props.get("lat")
+                lon = props.get("lon")
+                if event_time is None or magnitude is None or lat is None:
                     continue
-                event_id = str(
-                    props.get("eventId") or feature.get("id") or props.get("time")
-                )
-                depth = coords[2] if len(coords) > 2 else None
+                unid = str(props.get("unid") or feature.get("id"))
+                # properties.depth is positive km (geometry uses negative z).
+                depth = props.get("depth")
                 quakes.append(
                     Quake(
-                        id=f"ingv:{event_id}",
+                        id=f"emsc:{unid}",
                         source=self.key,
                         magnitude=float(magnitude),
-                        mag_type=props.get("magType"),
-                        place=props.get("place") or "Unknown location",
+                        mag_type=props.get("magtype"),
+                        place=(props.get("flynn_region") or "Unknown location").title(),
                         time=event_time,
-                        latitude=float(coords[1]),
-                        longitude=float(coords[0]),
+                        latitude=float(lat),
+                        longitude=float(lon),
                         depth_km=float(depth) if depth is not None else None,
-                        url=f"https://terremoti.ingv.it/event/{event_id}",
+                        url=f"https://www.seismicportal.eu/eventdetails.html?unid={unid}",
                     )
                 )
             except (TypeError, ValueError) as err:
-                _LOGGER.debug("Skipping malformed INGV feature: %s", err)
+                _LOGGER.debug("Skipping malformed EMSC feature: %s", err)
         return quakes

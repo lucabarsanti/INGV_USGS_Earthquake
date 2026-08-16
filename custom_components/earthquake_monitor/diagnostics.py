@@ -29,7 +29,10 @@ async def async_get_config_entry_diagnostics(
         "options": redact({**entry.data, **entry.options}),
         "sources": [source.key for source in coordinator.sources],
         "quake_count": len(data.quakes),
-        "alert_quake_count": len(data.alert_quakes),
+        "alert_quake_count": len(coordinator.current_alert_quakes()),
+        "last_alert_time": coordinator.last_alert_time.isoformat()
+        if coordinator.last_alert_time
+        else None,
         "last_quake": redact(data.last.as_dict()) if data.last else None,
         "last_update_success": coordinator.last_update_success,
     }

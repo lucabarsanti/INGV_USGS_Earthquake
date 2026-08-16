@@ -2,7 +2,7 @@
   "config": {
     "step": {
       "user": {
-        "title": "Earthquake Monitor (INGV + USGS)",
+        "title": "Earthquake Monitor (INGV + USGS + EMSC)",
         "description": "Monitor earthquakes in real time around a location. Distances and alerts are computed from the coordinates below (defaults to your home).",
         "data": {
           "latitude": "Latitude",
@@ -13,13 +13,15 @@
           "alert_radius_km": "Alert radius (km)",
           "alert_min_magnitude": "Alert minimum magnitude",
           "alert_window_minutes": "Alert active window (minutes)",
+          "max_depth_km": "Maximum depth (km)",
           "lookback_hours": "History window (hours)",
           "scan_interval_minutes": "Update interval (minutes)"
         }
       }
     },
     "error": {
-      "no_sources": "Select at least one data source."
+      "no_sources": "Select at least one data source.",
+      "cannot_connect": "Could not reach the selected earthquake services. Check your connection and try again."
     }
   },
   "options": {
@@ -35,20 +37,23 @@
           "alert_radius_km": "Alert radius (km)",
           "alert_min_magnitude": "Alert minimum magnitude",
           "alert_window_minutes": "Alert active window (minutes)",
+          "max_depth_km": "Maximum depth (km)",
           "lookback_hours": "History window (hours)",
           "scan_interval_minutes": "Update interval (minutes)"
         }
       }
     },
     "error": {
-      "no_sources": "Select at least one data source."
+      "no_sources": "Select at least one data source.",
+      "cannot_connect": "Could not reach the selected earthquake services. Check your connection and try again."
     }
   },
   "selector": {
     "sources": {
       "options": {
         "ingv": "INGV (Istituto Nazionale di Geofisica e Vulcanologia)",
-        "usgs": "USGS (United States Geological Survey)"
+        "usgs": "USGS (United States Geological Survey)",
+        "emsc": "EMSC (European-Mediterranean Seismological Centre)"
       }
     }
   },
@@ -57,16 +62,45 @@
       "last_earthquake": { "name": "Last earthquake" },
       "nearest_earthquake": { "name": "Nearest earthquake" },
       "strongest_earthquake": { "name": "Strongest earthquake" },
-      "earthquake_count": { "name": "Earthquake count" }
+      "earthquake_count": { "name": "Earthquake count" },
+      "last_alert": { "name": "Last alert" }
     },
     "binary_sensor": {
       "earthquake_alert": { "name": "Earthquake alert" }
+    }
+  },
+  "issues": {
+    "source_unavailable": {
+      "title": "Earthquake source unavailable",
+      "description": "The {source} service has been unreachable for a while. Earthquake data from this source is currently missing; the integration keeps retrying automatically."
     }
   },
   "services": {
     "refresh": {
       "name": "Refresh",
       "description": "Immediately refresh earthquake data from all configured sources."
+    },
+    "simulate_quake": {
+      "name": "Simulate earthquake",
+      "description": "Fire a synthetic earthquake_monitor_quake event to test automations, blueprints and notifications. No entity state is changed.",
+      "fields": {
+        "magnitude": {
+          "name": "Magnitude",
+          "description": "Magnitude of the simulated earthquake."
+        },
+        "distance_km": {
+          "name": "Distance (km)",
+          "description": "Distance from the configured location."
+        },
+        "depth_km": {
+          "name": "Depth (km)",
+          "description": "Depth of the simulated earthquake."
+        },
+        "place": {
+          "name": "Place",
+          "description": "Description of the simulated location."
+        }
+      }
     }
   }
 }

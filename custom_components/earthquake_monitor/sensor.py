@@ -1,6 +1,7 @@
 """Sensors for Earthquake Monitor."""
 from __future__ import annotations
 
+from datetime import datetime
 from typing import Any
 
 from homeassistant.components.sensor import (
@@ -32,6 +33,7 @@ async def async_setup_entry(
             NearestEarthquakeSensor(coordinator),
             StrongestEarthquakeSensor(coordinator),
             EarthquakeCountSensor(coordinator),
+            LastAlertSensor(coordinator),
         ]
     )
 
@@ -135,3 +137,17 @@ class EarthquakeCountSensor(EarthquakeMonitorEntity, SensorEntity):
         for quake in self.coordinator.data.quakes:
             by_source[quake.source] = by_source.get(quake.source, 0) + 1
         return {"by_source": by_source}
+
+
+class LastAlertSensor(EarthquakeMonitorEntity, SensorEntity):
+    """When the alert condition was last triggered (persisted across restarts)."""
+
+    _attr_icon = "mdi:bell-alert"
+    _attr_device_class = SensorDeviceClass.TIMESTAMP
+
+    def __init__(self, coordinator: EarthquakeCoordinator) -> None:
+        super().__init__(coordinator, "last_alert")
+
+    @property
+    def native_value(self) -> datetime | None:
+        return self.coordinator.last_alert_time

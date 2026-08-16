@@ -1,0 +1,5 @@
+pytest-homeassistant-custom-component
+# Needed because the integration declares a dependency on the frontend
+# component (it registers the Lovelace card).
+home-assistant-frontend
+ruff

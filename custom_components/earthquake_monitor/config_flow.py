@@ -1,9 +1,10 @@
 """Config flow for Earthquake Monitor (INGV + USGS)."""
 from __future__ import annotations
 
+import asyncio
+from datetime import timedelta
+import logging
 from typing import Any
-
-import voluptuous as vol
 
 from homeassistant.config_entries import (
     ConfigEntry,
@@ -12,7 +13,8 @@ from homeassistant.config_entries import (
     OptionsFlow,
 )
 from homeassistant.const import CONF_LATITUDE, CONF_LONGITUDE, CONF_NAME
-from homeassistant.core import callback
+from homeassistant.core import HomeAssistant, callback
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.selector import (
     NumberSelector,
     NumberSelectorConfig,
@@ -21,12 +23,14 @@ from homeassistant.helpers.selector import (
     SelectSelectorConfig,
     SelectSelectorMode,
 )
+import voluptuous as vol
 
 from .const import (
     CONF_ALERT_MIN_MAGNITUDE,
     CONF_ALERT_RADIUS,
     CONF_ALERT_WINDOW,
     CONF_LOOKBACK,
+    CONF_MAX_DEPTH,
     CONF_MIN_MAGNITUDE,
     CONF_RADIUS,
     CONF_SCAN_INTERVAL,
@@ -35,6 +39,7 @@ from .const import (
     DEFAULT_ALERT_RADIUS_KM,
     DEFAULT_ALERT_WINDOW_MINUTES,
     DEFAULT_LOOKBACK_HOURS,
+    DEFAULT_MAX_DEPTH_KM,
     DEFAULT_MIN_MAGNITUDE,
     DEFAULT_NAME,
     DEFAULT_RADIUS_KM,
@@ -44,6 +49,37 @@ from .const import (
     MIN_SCAN_INTERVAL_MINUTES,
 )
 from .sources import SOURCE_REGISTRY
+
+_LOGGER = logging.getLogger(__name__)
+
+
+async def _async_test_sources(
+    hass: HomeAssistant, source_keys: list[str], latitude: float, longitude: float
+) -> bool:
+    """Do a small test fetch against each selected source."""
+    from homeassistant.util import dt as dt_util
+
+    session = async_get_clientsession(hass)
+    start = dt_util.utcnow() - timedelta(hours=1)
+
+    async def _probe(key: str) -> None:
+        await SOURCE_REGISTRY[key]().async_fetch(
+            session,
+            start=start,
+            latitude=latitude,
+            longitude=longitude,
+            radius_km=100.0,
+            min_magnitude=5.0,
+        )
+
+    try:
+        await asyncio.gather(
+            *(_probe(key) for key in source_keys if key in SOURCE_REGISTRY)
+        )
+    except Exception as err:  # noqa: BLE001 — any failure means "can't connect"
+        _LOGGER.warning("Source connection test failed: %s", err)
+        return False
+    return True
 
 
 def _build_schema(defaults: dict[str, Any]) -> vol.Schema:
@@ -122,6 +158,17 @@ def _build_schema(defaults: dict[str, Any]) -> vol.Schema:
                 )
             ),
             vol.Required(
+                CONF_MAX_DEPTH, default=defaults[CONF_MAX_DEPTH]
+            ): NumberSelector(
+                NumberSelectorConfig(
+                    min=1,
+                    max=700,
+                    step=1,
+                    unit_of_measurement="km",
+                    mode=NumberSelectorMode.BOX,
+                )
+            ),
+            vol.Required(
                 CONF_LOOKBACK, default=defaults[CONF_LOOKBACK]
             ): NumberSelector(
                 NumberSelectorConfig(
@@ -157,6 +204,7 @@ def _normalize(user_input: dict[str, Any]) -> dict[str, Any]:
         CONF_MIN_MAGNITUDE,
         CONF_ALERT_RADIUS,
         CONF_ALERT_MIN_MAGNITUDE,
+        CONF_MAX_DEPTH,
     ):
         data[key] = float(data[key])
     for key in (CONF_ALERT_WINDOW, CONF_LOOKBACK, CONF_SCAN_INTERVAL):
@@ -178,8 +226,16 @@ class EarthquakeMonitorConfigFlow(ConfigFlow, domain=DOMAIN):
                 errors[CONF_SOURCES] = "no_sources"
             else:
                 data = _normalize(user_input)
-                data[CONF_NAME] = DEFAULT_NAME
-                return self.async_create_entry(title=DEFAULT_NAME, data=data)
+                if not await _async_test_sources(
+                    self.hass,
+                    data[CONF_SOURCES],
+                    data[CONF_LATITUDE],
+                    data[CONF_LONGITUDE],
+                ):
+                    errors["base"] = "cannot_connect"
+                else:
+                    data[CONF_NAME] = DEFAULT_NAME
+                    return self.async_create_entry(title=DEFAULT_NAME, data=data)
 
         defaults = {
             CONF_LATITUDE: self.hass.config.latitude,
@@ -190,6 +246,7 @@ class EarthquakeMonitorConfigFlow(ConfigFlow, domain=DOMAIN):
             CONF_ALERT_RADIUS: DEFAULT_ALERT_RADIUS_KM,
             CONF_ALERT_MIN_MAGNITUDE: DEFAULT_ALERT_MIN_MAGNITUDE,
             CONF_ALERT_WINDOW: DEFAULT_ALERT_WINDOW_MINUTES,
+            CONF_MAX_DEPTH: DEFAULT_MAX_DEPTH_KM,
             CONF_LOOKBACK: DEFAULT_LOOKBACK_HOURS,
             CONF_SCAN_INTERVAL: DEFAULT_SCAN_INTERVAL_MINUTES,
         }
@@ -217,7 +274,16 @@ class EarthquakeMonitorOptionsFlow(OptionsFlow):
             if not user_input.get(CONF_SOURCES):
                 errors[CONF_SOURCES] = "no_sources"
             else:
-                return self.async_create_entry(data=_normalize(user_input))
+                data = _normalize(user_input)
+                if not await _async_test_sources(
+                    self.hass,
+                    data[CONF_SOURCES],
+                    data[CONF_LATITUDE],
+                    data[CONF_LONGITUDE],
+                ):
+                    errors["base"] = "cannot_connect"
+                else:
+                    return self.async_create_entry(data=data)
 
         current = {**self.config_entry.data, **self.config_entry.options}
         defaults = {
@@ -235,6 +301,7 @@ class EarthquakeMonitorOptionsFlow(OptionsFlow):
             CONF_ALERT_WINDOW: current.get(
                 CONF_ALERT_WINDOW, DEFAULT_ALERT_WINDOW_MINUTES
             ),
+            CONF_MAX_DEPTH: current.get(CONF_MAX_DEPTH, DEFAULT_MAX_DEPTH_KM),
             CONF_LOOKBACK: current.get(CONF_LOOKBACK, DEFAULT_LOOKBACK_HOURS),
             CONF_SCAN_INTERVAL: current.get(
                 CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL_MINUTES

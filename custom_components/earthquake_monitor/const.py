@@ -20,10 +20,12 @@ CONF_ALERT_MIN_MAGNITUDE = "alert_min_magnitude"
 CONF_ALERT_WINDOW = "alert_window_minutes"
 CONF_LOOKBACK = "lookback_hours"
 CONF_SCAN_INTERVAL = "scan_interval_minutes"
+CONF_MAX_DEPTH = "max_depth_km"
 
 # Source identifiers
 SOURCE_INGV = "ingv"
 SOURCE_USGS = "usgs"
+SOURCE_EMSC = "emsc"
 # Reserved for a future local seismograph source (Raspberry Shake, MQTT, ...).
 SOURCE_LOCAL = "local"
 
@@ -36,6 +38,7 @@ DEFAULT_ALERT_MIN_MAGNITUDE = 3.5
 DEFAULT_ALERT_WINDOW_MINUTES = 60
 DEFAULT_LOOKBACK_HOURS = 24
 DEFAULT_SCAN_INTERVAL_MINUTES = 5
+DEFAULT_MAX_DEPTH_KM = 700.0
 
 MIN_SCAN_INTERVAL_MINUTES = 1
 MAX_QUAKES_KEPT = 200
@@ -43,6 +46,13 @@ MAX_QUAKES_IN_ATTRIBUTES = 50
 
 # Event fired for every newly detected earthquake.
 EVENT_QUAKE = f"{DOMAIN}_quake"
+# Event fired when the magnitude of a known quake is revised significantly.
+EVENT_QUAKE_UPDATED = f"{DOMAIN}_quake_updated"
+MAGNITUDE_REVISION_THRESHOLD = 0.3
+
+STORAGE_VERSION = 1
+# Consecutive failed polls of a source before a repair issue is raised.
+FAILURES_BEFORE_ISSUE = 6
 
 # Frontend card
 URL_BASE = f"/{DOMAIN}"

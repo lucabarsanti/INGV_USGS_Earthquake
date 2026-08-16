@@ -5,8 +5,8 @@ USGS data is in the public domain.
 """
 from __future__ import annotations
 
+from datetime import UTC, datetime
 import logging
-from datetime import datetime, timezone
 
 from aiohttp import ClientSession
 
@@ -71,11 +71,14 @@ class UsgsSource(EarthquakeSource):
                         magnitude=float(magnitude),
                         mag_type=props.get("magType"),
                         place=props.get("place") or "Unknown location",
-                        time=datetime.fromtimestamp(time_ms / 1000, tz=timezone.utc),
+                        time=datetime.fromtimestamp(time_ms / 1000, tz=UTC),
                         latitude=float(coords[1]),
                         longitude=float(coords[0]),
                         depth_km=float(depth) if depth is not None else None,
                         url=props.get("url"),
+                        tsunami=bool(props.get("tsunami")),
+                        felt=int(props["felt"]) if props.get("felt") else None,
+                        mmi=float(props["mmi"]) if props.get("mmi") else None,
                     )
                 )
             except (TypeError, ValueError) as err:

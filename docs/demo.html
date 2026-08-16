@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<!--
+  Standalone demo of earthquake-map-card with sample data.
+  Open in a browser (needs internet for map tiles) — used to generate the
+  README screenshot. Not served by the integration.
+-->
+<head>
+  <meta charset="utf-8" />
+  <title>earthquake-map-card demo</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 24px;
+      background: #f2f4f6;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --primary-text-color: #212121;
+      --secondary-text-color: #727272;
+      --secondary-background-color: #f0f0f0;
+      --card-background-color: #fff;
+      --primary-color: #03a9f4;
+    }
+    .wrap { max-width: 480px; margin: 0 auto; }
+  </style>
+  <script>
+    // Minimal ha-card stand-in so the card renders outside Home Assistant.
+    customElements.define(
+      "ha-card",
+      class extends HTMLElement {
+        connectedCallback() {
+          this.style.cssText =
+            "display:block;background:#fff;border-radius:12px;box-shadow:0 2px 6px rgba(0,0,0,.15);overflow:hidden;";
+        }
+      }
+    );
+  </script>
+  <script src="../custom_components/earthquake_monitor/www/vendor/leaflet/leaflet.js"></script>
+  <script>
+    // Point the card's stylesheet link at the local vendored copy.
+    window.__DEMO_LEAFLET_CSS = "../custom_components/earthquake_monitor/www/vendor/leaflet/leaflet.css";
+  </script>
+</head>
+<body>
+  <div class="wrap"><div id="host"></div></div>
+  <script src="../custom_components/earthquake_monitor/www/earthquake-map-card.js"></script>
+  <script>
+    const now = Date.now();
+    const q = (id, source, mag, place, lat, lon, depth, minAgo, dist, extra = {}) => ({
+      id, source, magnitude: mag, mag_type: "ML", place,
+      time: new Date(now - minAgo * 60000).toISOString(),
+      latitude: lat, longitude: lon, depth_km: depth,
+      url: "https://terremoti.ingv.it/", distance_km: dist,
+      tsunami: false, felt: null, mmi: null, ...extra,
+    });
+    const quakes = [
+      q("1", "ingv", 4.2, "2 km NE Fosdinovo (MS)", 44.146, 10.043, 10.4, 42, 88),
+      q("2", "ingv", 3.1, "Costa Marchigiana Anconetana", 43.64, 13.42, 8.2, 95, 132),
+      q("3", "emsc", 2.6, "Central Italy", 42.79, 13.15, 11.0, 160, 34),
+      q("4", "ingv", 2.2, "5 km W Norcia (PG)", 42.79, 13.03, 9.1, 270, 28),
+      q("5", "usgs", 5.1, "Ionian Sea", 37.9, 20.7, 33.0, 380, 540),
+    ];
+    const state = {
+      last_updated: new Date().toISOString(),
+      attributes: {
+        quakes,
+        config_latitude: 42.5,
+        config_longitude: 12.9,
+        radius_km: 500,
+        alert_radius_km: 100,
+      },
+    };
+    const hass = {
+      states: { "sensor.earthquake_monitor_last_earthquake": state },
+      themes: { darkMode: false },
+      locale: { language: "it" },
+    };
+    const card = document.createElement("earthquake-map-card");
+    card.setConfig({
+      entity: "sensor.earthquake_monitor_last_earthquake",
+      title: "Terremoti",
+      height: 340,
+      zoom: 6,
+      max_list: 4,
+    });
+    card.hass = hass;
+    document.getElementById("host").appendChild(card);
+  </script>
+</body>
+</html>

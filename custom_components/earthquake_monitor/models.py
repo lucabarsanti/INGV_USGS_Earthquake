@@ -21,6 +21,10 @@ class Quake:
     depth_km: float | None
     url: str | None
     distance_km: float | None = field(default=None)
+    # USGS extras (None for catalogs that do not provide them)
+    tsunami: bool = field(default=False)
+    felt: int | None = field(default=None)
+    mmi: float | None = field(default=None)
 
     def as_dict(self) -> dict[str, Any]:
         """Return a JSON-serializable representation (attributes / events)."""
@@ -38,4 +42,7 @@ class Quake:
             "distance_km": round(self.distance_km, 1)
             if self.distance_km is not None
             else None,
+            "tsunami": self.tsunami,
+            "felt": self.felt,
+            "mmi": self.mmi,
         }

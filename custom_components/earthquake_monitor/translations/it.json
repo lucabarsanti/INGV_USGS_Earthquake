@@ -2,7 +2,7 @@
   "config": {
     "step": {
       "user": {
-        "title": "Earthquake Monitor (INGV + USGS)",
+        "title": "Earthquake Monitor (INGV + USGS + EMSC)",
         "description": "Monitora i terremoti in tempo reale attorno a una posizione. Distanze e allerte sono calcolate dalle coordinate qui sotto (predefinita: la tua casa).",
         "data": {
           "latitude": "Latitudine",
@@ -13,13 +13,15 @@
           "alert_radius_km": "Raggio di allerta (km)",
           "alert_min_magnitude": "Magnitudo minima di allerta",
           "alert_window_minutes": "Durata dell'allerta (minuti)",
+          "max_depth_km": "Profondità massima (km)",
           "lookback_hours": "Finestra storica (ore)",
           "scan_interval_minutes": "Intervallo di aggiornamento (minuti)"
         }
       }
     },
     "error": {
-      "no_sources": "Seleziona almeno una sorgente dati."
+      "no_sources": "Seleziona almeno una sorgente dati.",
+      "cannot_connect": "Impossibile raggiungere i servizi sismici selezionati. Controlla la connessione e riprova."
     }
   },
   "options": {
@@ -35,20 +37,23 @@
           "alert_radius_km": "Raggio di allerta (km)",
           "alert_min_magnitude": "Magnitudo minima di allerta",
           "alert_window_minutes": "Durata dell'allerta (minuti)",
+          "max_depth_km": "Profondità massima (km)",
           "lookback_hours": "Finestra storica (ore)",
           "scan_interval_minutes": "Intervallo di aggiornamento (minuti)"
         }
       }
     },
     "error": {
-      "no_sources": "Seleziona almeno una sorgente dati."
+      "no_sources": "Seleziona almeno una sorgente dati.",
+      "cannot_connect": "Impossibile raggiungere i servizi sismici selezionati. Controlla la connessione e riprova."
     }
   },
   "selector": {
     "sources": {
       "options": {
         "ingv": "INGV (Istituto Nazionale di Geofisica e Vulcanologia)",
-        "usgs": "USGS (United States Geological Survey)"
+        "usgs": "USGS (United States Geological Survey)",
+        "emsc": "EMSC (Centro Sismologico Euro-Mediterraneo)"
       }
     }
   },
@@ -57,16 +62,45 @@
       "last_earthquake": { "name": "Ultimo terremoto" },
       "nearest_earthquake": { "name": "Terremoto più vicino" },
       "strongest_earthquake": { "name": "Terremoto più forte" },
-      "earthquake_count": { "name": "Numero di terremoti" }
+      "earthquake_count": { "name": "Numero di terremoti" },
+      "last_alert": { "name": "Ultima allerta" }
     },
     "binary_sensor": {
       "earthquake_alert": { "name": "Allerta terremoto" }
+    }
+  },
+  "issues": {
+    "source_unavailable": {
+      "title": "Sorgente sismica non disponibile",
+      "description": "Il servizio {source} risulta irraggiungibile da tempo. I dati sismici di questa sorgente al momento mancano; l'integrazione continua a riprovare automaticamente."
     }
   },
   "services": {
     "refresh": {
       "name": "Aggiorna",
       "description": "Aggiorna subito i dati sismici da tutte le sorgenti configurate."
+    },
+    "simulate_quake": {
+      "name": "Simula terremoto",
+      "description": "Genera un evento earthquake_monitor_quake sintetico per testare automazioni, blueprint e notifiche. Nessuno stato delle entità viene modificato.",
+      "fields": {
+        "magnitude": {
+          "name": "Magnitudo",
+          "description": "Magnitudo del terremoto simulato."
+        },
+        "distance_km": {
+          "name": "Distanza (km)",
+          "description": "Distanza dalla posizione configurata."
+        },
+        "depth_km": {
+          "name": "Profondità (km)",
+          "description": "Profondità del terremoto simulato."
+        },
+        "place": {
+          "name": "Luogo",
+          "description": "Descrizione della località simulata."
+        }
+      }
     }
   }
 }

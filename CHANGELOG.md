@@ -1,5 +1,29 @@
 # Changelog
 
+## 0.2.0 (2026-08-16)
+
+Robustness & features release / Solidità e nuove funzioni.
+
+### Added
+- **EMSC** (European-Mediterranean Seismological Centre) as a third source
+- **`simulate_quake` service** to test automations and notifications
+- `earthquake_monitor_quake_updated` event on significant magnitude revisions (≥ 0.3)
+- `sensor.*_last_alert` timestamp sensor, persisted across restarts
+- USGS extras per quake: tsunami flag, felt reports, ShakeMap MMI
+- Maximum depth filter option
+- Card: **visual editor**, IT/EN localization, tsunami/felt info in popups
+- Connection test in the config/options flow (`cannot_connect`)
+- Repair issues when a source keeps failing (auto-resolved on recovery)
+- Seen-quake state persisted (no missed events after a restart, no duplicates)
+- Alert binary sensor now turns off punctually (expiry timer)
+- Notification blueprint: multiple devices, "only integration alerts" option
+- Full test suite (pytest-homeassistant-custom-component) + ruff, run in CI
+- Release workflow, Dependabot, issue templates, README screenshot
+
+### Changed
+- **Leaflet is now bundled and served locally** — no CDN, works offline
+- De-duplication priority is now INGV > EMSC > USGS
+
 ## 0.1.0 (2026-08-16)
 
 Initial release / Prima versione.

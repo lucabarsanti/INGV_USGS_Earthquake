@@ -1,0 +1,44 @@
+name: Bug report / Segnalazione bug
+description: Report a problem with the integration or the map card.
+labels: ["bug"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe the bug / Descrivi il problema
+      description: What happened? What did you expect? / Cosa è successo? Cosa ti aspettavi?
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Integration version / Versione integrazione
+      placeholder: "0.2.0"
+    validations:
+      required: true
+  - type: input
+    id: ha_version
+    attributes:
+      label: Home Assistant version / Versione Home Assistant
+      placeholder: "2026.2.3"
+    validations:
+      required: true
+  - type: checkboxes
+    id: sources
+    attributes:
+      label: Data sources in use / Sorgenti dati in uso
+      options:
+        - label: INGV
+        - label: USGS
+        - label: EMSC
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: Relevant Home Assistant log lines (Settings → System → Logs).
+      render: text
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Diagnostics
+      description: Attach the diagnostics download from the integration page (coordinates are redacted automatically).

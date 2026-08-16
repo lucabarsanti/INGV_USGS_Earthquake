@@ -1,5 +1,5 @@
 blueprint:
-  name: Earthquake notification (INGV + USGS) / Notifica terremoto
+  name: Earthquake notification (INGV + USGS + EMSC) / Notifica terremoto
   description: >-
     Send a notification when the Earthquake Monitor integration detects a new
     earthquake within a chosen distance and above a chosen magnitude.
@@ -30,12 +30,21 @@ blueprint:
           max: 9
           step: 0.1
           mode: box
-    notify_device:
-      name: Device to notify / Dispositivo da notificare
-      description: Device running the Home Assistant Companion app.
+    only_alert:
+      name: Only integration alerts / Solo allerte dell'integrazione
+      description: >-
+        Notify only for quakes that also match the alert radius/magnitude
+        configured in the integration (is_alert).
+      default: false
+      selector:
+        boolean:
+    notify_devices:
+      name: Devices to notify / Dispositivi da notificare
+      description: Devices running the Home Assistant Companion app.
       selector:
         device:
           integration: mobile_app
+          multiple: true
     critical:
       name: Critical notification / Notifica critica
       description: Deliver as a critical alert (bypasses silent mode on iOS/Android).
@@ -53,8 +62,8 @@ trigger:
 variables:
   max_distance: !input max_distance
   min_magnitude: !input min_magnitude
+  only_alert: !input only_alert
   critical: !input critical
-  notify_device: !input notify_device
   quake_distance: "{{ trigger.event.data.distance_km | float(9e9) }}"
   quake_magnitude: "{{ trigger.event.data.magnitude | float(0) }}"
 
@@ -62,27 +71,31 @@ condition:
   - condition: template
     value_template: >-
       {{ quake_distance <= max_distance | float
-         and quake_magnitude >= min_magnitude | float }}
+         and quake_magnitude >= min_magnitude | float
+         and (not only_alert or trigger.event.data.is_alert) }}
 
 action:
-  - service: >-
-      notify.mobile_app_{{ device_attr(notify_device, "name") | slugify }}
-    data:
-      title: >-
-        🌍 Earthquake M {{ '%.1f' | format(quake_magnitude) }}
-      message: >-
-        {{ trigger.event.data.place }} —
-        {{ '%.0f' | format(quake_distance) }} km away, depth
-        {{ trigger.event.data.depth_km | round(0) }} km
-        ({{ trigger.event.data.source | upper }}).
-      data: >-
-        {% set base = {
-          "url": trigger.event.data.url,
-          "clickAction": trigger.event.data.url,
-          "tag": trigger.event.data.id
-        } %}
-        {% if critical %}
-          {{ dict(base, push={"sound": {"name": "default", "critical": 1, "volume": 1.0}}, ttl=0, priority="high", channel="alarm_stream") }}
-        {% else %}
-          {{ base }}
-        {% endif %}
+  - repeat:
+      for_each: !input notify_devices
+      sequence:
+        - service: >-
+            notify.mobile_app_{{ device_attr(repeat.item, "name") | slugify }}
+          data:
+            title: >-
+              🌍 Earthquake M {{ '%.1f' | format(quake_magnitude) }}
+            message: >-
+              {{ trigger.event.data.place }} —
+              {{ '%.0f' | format(quake_distance) }} km away, depth
+              {{ trigger.event.data.depth_km | round(0) }} km
+              ({{ trigger.event.data.source | upper }}).
+            data: >-
+              {% set base = {
+                "url": trigger.event.data.url,
+                "clickAction": trigger.event.data.url,
+                "tag": trigger.event.data.id
+              } %}
+              {% if critical %}
+                {{ dict(base, push={"sound": {"name": "default", "critical": 1, "volume": 1.0}}, ttl=0, priority="high", channel="alarm_stream") }}
+              {% else %}
+                {{ base }}
+              {% endif %}

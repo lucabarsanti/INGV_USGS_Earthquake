@@ -1,3 +1,48 @@
 refresh:
   name: Refresh
   description: Immediately refresh earthquake data from all configured sources.
+
+simulate_quake:
+  name: Simulate earthquake
+  description: >-
+    Fire a synthetic earthquake_monitor_quake event to test automations,
+    blueprints and notifications. No entity state is changed.
+  fields:
+    magnitude:
+      name: Magnitude
+      description: Magnitude of the simulated earthquake.
+      default: 4.5
+      selector:
+        number:
+          min: 0
+          max: 9
+          step: 0.1
+          mode: box
+    distance_km:
+      name: Distance (km)
+      description: Distance from the configured location.
+      default: 30
+      selector:
+        number:
+          min: 0
+          max: 20000
+          step: 1
+          unit_of_measurement: km
+          mode: box
+    depth_km:
+      name: Depth (km)
+      description: Depth of the simulated earthquake.
+      default: 10
+      selector:
+        number:
+          min: 0
+          max: 700
+          step: 1
+          unit_of_measurement: km
+          mode: box
+    place:
+      name: Place
+      description: Description of the simulated location.
+      default: Simulated earthquake
+      selector:
+        text:
