@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.4 (2026-08-17)
+
+- **Integration icon** shipped locally in `brand/` (icon.png + icon@2x.png)
+  using the new Brands Proxy API — shown in the Home Assistant UI on
+  HA 2026.3+ with no home-assistant/brands PR needed
+
 ## 0.2.3 (2026-08-17)
 
 - Card: **interactive filters** — minimum magnitude chips (All/M2+..M5+),
