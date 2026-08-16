@@ -1,0 +1,13 @@
+{
+  "domain": "earthquake_monitor",
+  "name": "Earthquake Monitor (INGV + USGS)",
+  "codeowners": ["@lucabarsanti"],
+  "config_flow": true,
+  "dependencies": ["http", "frontend"],
+  "documentation": "https://github.com/lucabarsanti/INGV_USGS_Earthquake",
+  "integration_type": "service",
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/lucabarsanti/INGV_USGS_Earthquake/issues",
+  "requirements": [],
+  "version": "0.1.0"
+}

@@ -1,0 +1,3 @@
+refresh:
+  name: Refresh
+  description: Immediately refresh earthquake data from all configured sources.

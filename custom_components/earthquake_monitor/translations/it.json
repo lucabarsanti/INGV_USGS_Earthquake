@@ -1,0 +1,72 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Earthquake Monitor (INGV + USGS)",
+        "description": "Monitora i terremoti in tempo reale attorno a una posizione. Distanze e allerte sono calcolate dalle coordinate qui sotto (predefinita: la tua casa).",
+        "data": {
+          "latitude": "Latitudine",
+          "longitude": "Longitudine",
+          "sources": "Sorgenti dati",
+          "radius_km": "Raggio di monitoraggio (km)",
+          "min_magnitude": "Magnitudo minima da tracciare",
+          "alert_radius_km": "Raggio di allerta (km)",
+          "alert_min_magnitude": "Magnitudo minima di allerta",
+          "alert_window_minutes": "Durata dell'allerta (minuti)",
+          "lookback_hours": "Finestra storica (ore)",
+          "scan_interval_minutes": "Intervallo di aggiornamento (minuti)"
+        }
+      }
+    },
+    "error": {
+      "no_sources": "Seleziona almeno una sorgente dati."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Opzioni Earthquake Monitor",
+        "data": {
+          "latitude": "Latitudine",
+          "longitude": "Longitudine",
+          "sources": "Sorgenti dati",
+          "radius_km": "Raggio di monitoraggio (km)",
+          "min_magnitude": "Magnitudo minima da tracciare",
+          "alert_radius_km": "Raggio di allerta (km)",
+          "alert_min_magnitude": "Magnitudo minima di allerta",
+          "alert_window_minutes": "Durata dell'allerta (minuti)",
+          "lookback_hours": "Finestra storica (ore)",
+          "scan_interval_minutes": "Intervallo di aggiornamento (minuti)"
+        }
+      }
+    },
+    "error": {
+      "no_sources": "Seleziona almeno una sorgente dati."
+    }
+  },
+  "selector": {
+    "sources": {
+      "options": {
+        "ingv": "INGV (Istituto Nazionale di Geofisica e Vulcanologia)",
+        "usgs": "USGS (United States Geological Survey)"
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "last_earthquake": { "name": "Ultimo terremoto" },
+      "nearest_earthquake": { "name": "Terremoto più vicino" },
+      "strongest_earthquake": { "name": "Terremoto più forte" },
+      "earthquake_count": { "name": "Numero di terremoti" }
+    },
+    "binary_sensor": {
+      "earthquake_alert": { "name": "Allerta terremoto" }
+    }
+  },
+  "services": {
+    "refresh": {
+      "name": "Aggiorna",
+      "description": "Aggiorna subito i dati sismici da tutte le sorgenti configurate."
+    }
+  }
+}

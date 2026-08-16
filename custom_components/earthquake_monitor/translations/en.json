@@ -1,0 +1,72 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Earthquake Monitor (INGV + USGS)",
+        "description": "Monitor earthquakes in real time around a location. Distances and alerts are computed from the coordinates below (defaults to your home).",
+        "data": {
+          "latitude": "Latitude",
+          "longitude": "Longitude",
+          "sources": "Data sources",
+          "radius_km": "Monitoring radius (km)",
+          "min_magnitude": "Minimum magnitude to track",
+          "alert_radius_km": "Alert radius (km)",
+          "alert_min_magnitude": "Alert minimum magnitude",
+          "alert_window_minutes": "Alert active window (minutes)",
+          "lookback_hours": "History window (hours)",
+          "scan_interval_minutes": "Update interval (minutes)"
+        }
+      }
+    },
+    "error": {
+      "no_sources": "Select at least one data source."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Earthquake Monitor options",
+        "data": {
+          "latitude": "Latitude",
+          "longitude": "Longitude",
+          "sources": "Data sources",
+          "radius_km": "Monitoring radius (km)",
+          "min_magnitude": "Minimum magnitude to track",
+          "alert_radius_km": "Alert radius (km)",
+          "alert_min_magnitude": "Alert minimum magnitude",
+          "alert_window_minutes": "Alert active window (minutes)",
+          "lookback_hours": "History window (hours)",
+          "scan_interval_minutes": "Update interval (minutes)"
+        }
+      }
+    },
+    "error": {
+      "no_sources": "Select at least one data source."
+    }
+  },
+  "selector": {
+    "sources": {
+      "options": {
+        "ingv": "INGV (Istituto Nazionale di Geofisica e Vulcanologia)",
+        "usgs": "USGS (United States Geological Survey)"
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "last_earthquake": { "name": "Last earthquake" },
+      "nearest_earthquake": { "name": "Nearest earthquake" },
+      "strongest_earthquake": { "name": "Strongest earthquake" },
+      "earthquake_count": { "name": "Earthquake count" }
+    },
+    "binary_sensor": {
+      "earthquake_alert": { "name": "Earthquake alert" }
+    }
+  },
+  "services": {
+    "refresh": {
+      "name": "Refresh",
+      "description": "Immediately refresh earthquake data from all configured sources."
+    }
+  }
+}
