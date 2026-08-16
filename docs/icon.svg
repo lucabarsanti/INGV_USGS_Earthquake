@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Earthquake Monitor: a home crossed by a seismogram trace -->
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <!-- house roof + body -->
+    <path d="M88 244 L256 100 L424 244" stroke="#1976d2" stroke-width="46"/>
+    <path d="M140 268 V400 a26 26 0 0 0 26 26 h180 a26 26 0 0 0 26-26 V268"
+          stroke="#1976d2" stroke-width="46"/>
+    <!-- seismogram trace -->
+    <polyline points="96 340 190 340 224 282 262 400 300 306 334 340 416 340"
+              stroke="#e53935" stroke-width="34"/>
+  </g>
+</svg>

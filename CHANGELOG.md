@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.1 (2026-08-17)
+
+- Card: the home position is now a **house marker** instead of a blue dot
+- New minimal project **icon** (docs/icon.svg + PNGs, ready for the
+  home-assistant/brands submission), shown in the README
+
 ## 0.2.0 (2026-08-16)
 
 Robustness & features release / Solidità e nuove funzioni.

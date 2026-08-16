@@ -75,6 +75,12 @@ function safeUrl(url) {
   return typeof url === "string" && /^https?:\/\//.test(url) ? url : null;
 }
 
+// Home marker: minimal house glyph with a white outline for contrast on
+// both light and dark tiles.
+const HOME_ICON_SVG =
+  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="30" height="30">' +
+  '<path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" fill="#1976d2" stroke="#ffffff" stroke-width="1.4" stroke-linejoin="round"/></svg>';
+
 let leafletLoader = null;
 function loadLeaflet() {
   if (window.L) return Promise.resolve(window.L);
@@ -204,6 +210,11 @@ class EarthquakeMapCard extends HTMLElement {
           z-index: 0;
         }
         .leaflet-container { font: inherit; }
+        .home-marker {
+          background: none;
+          border: none;
+          filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.45));
+        }
         .quake-popup { font-size: 13px; line-height: 1.5; }
         .quake-popup .mag { font-weight: 700; }
         .quake-popup .tsunami { color: #d32f2f; font-weight: 700; }
@@ -342,11 +353,16 @@ class EarthquakeMapCard extends HTMLElement {
     const homeLon = attrs.config_longitude;
 
     if (homeLat != null && homeLon != null) {
-      L.circleMarker([homeLat, homeLon], {
-        radius: 6,
-        color: "#1976d2",
-        fillColor: "#1976d2",
-        fillOpacity: 0.9,
+      const homeIcon = L.divIcon({
+        className: "home-marker",
+        html: HOME_ICON_SVG,
+        iconSize: [30, 30],
+        iconAnchor: [15, 15],
+      });
+      L.marker([homeLat, homeLon], {
+        icon: homeIcon,
+        interactive: true,
+        keyboard: false,
       })
         .bindTooltip(t.home)
         .addTo(this._layerGroup);

@@ -1,3 +1,5 @@
+<p align="center"><img src="docs/icon.png" width="110" alt="Earthquake Monitor icon" /></p>
+
 # 🌍 Earthquake Monitor (INGV + USGS + EMSC) for Home Assistant
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://github.com/hacs/integration)
